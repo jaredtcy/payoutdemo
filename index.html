@@ -23,6 +23,12 @@
                 transform: translateX(0);
             }
         }
+        .fx-highlight {
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="text-white">
@@ -36,7 +42,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <span class="text-sm">190+ Countries Supported</span>
+                    <span class="text-sm">190+ Countries | Multi-Currency | Digital Wallets</span>
                 </div>
             </div>
 
@@ -52,13 +58,19 @@
 
                     <!-- Tabs -->
                     <div class="flex gap-2 mb-6">
-                        <button id="cardTab" onclick="switchTab('card')" class="flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg">
+                        <button id="cardTab" onclick="switchTab('card')" class="flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                             </svg>
-                            Card Payout
+                            Card
                         </button>
-                        <button id="achTab" onclick="switchTab('ach')" class="flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10">
+                        <button id="walletTab" onclick="switchTab('wallet')" class="flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            Wallet
+                        </button>
+                        <button id="achTab" onclick="switchTab('ach')" class="flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                             </svg>
@@ -75,12 +87,45 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-sm font-medium mb-1 text-blue-200">Amount</label>
-                                <input type="text" id="amount" value="500.00" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <label class="block text-sm font-medium mb-1 text-blue-200">Amount (USD)</label>
+                                <input type="text" id="amountUSD" value="100.00" oninput="updateFXPreview()" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-1 text-blue-200">Currency</label>
-                                <input type="text" value="USD" disabled class="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg text-gray-400">
+                                <label class="block text-sm font-medium mb-1 text-blue-200">Trader Country</label>
+                                <select id="traderCountry" onchange="updateFXPreview()" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="US">🇺🇸 US (USD)</option>
+                                    <option value="GB">🇬🇧 UK (GBP)</option>
+                                    <option value="EU">🇪🇺 EU (EUR)</option>
+                                    <option value="AU">🇦🇺 AU (AUD)</option>
+                                    <option value="CA">🇨🇦 CA (CAD)</option>
+                                    <option value="JP">🇯🇵 JP (JPY)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Currency Conversion Options -->
+                        <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-lg p-4">
+                            <label class="block text-sm font-medium mb-2 text-amber-200">💱 Currency Settlement</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="settlementType" value="usd" checked onchange="updateFXPreview()" class="w-4 h-4">
+                                    <span class="text-sm">Pay in USD (No conversion - Trader handles FX)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="settlementType" value="local" onchange="updateFXPreview()" class="w-4 h-4">
+                                    <span class="text-sm">Pay in Local Currency (Nuvei MCP conversion)</span>
+                                </label>
+                            </div>
+                            <div id="fxPreview" class="mt-3 p-3 bg-black/30 rounded-lg hidden">
+                                <div class="text-xs text-gray-400 mb-1">Live FX Rate Preview:</div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Rate:</span>
+                                    <span id="fxRate" class="font-mono fx-highlight"></span>
+                                </div>
+                                <div class="flex items-center justify-between mt-1">
+                                    <span class="text-sm">Trader Receives:</span>
+                                    <span id="convertedAmount" class="font-mono text-green-400 font-bold"></span>
+                                </div>
                             </div>
                         </div>
 
@@ -105,6 +150,30 @@
                             </div>
                         </div>
 
+                        <!-- Digital Wallet Fields -->
+                        <div id="walletFields" style="display: none;">
+                            <div>
+                                <label class="block text-sm font-medium mb-1 text-blue-200">Wallet Provider</label>
+                                <select id="walletProvider" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="ApplePay">🍎 Apple Pay</option>
+                                    <option value="GooglePay">📱 Google Pay</option>
+                                    <option value="SamsungPay">📲 Samsung Pay</option>
+                                </select>
+                            </div>
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium mb-1 text-blue-200">Mobile Token</label>
+                                <textarea id="mobileToken" placeholder="Token received from wallet provider..." class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs" rows="3">eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...</textarea>
+                            </div>
+                            <div class="mt-3 p-3 bg-blue-500/20 border border-blue-500/40 rounded-lg">
+                                <p class="text-xs text-blue-200">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Wallet tokens are encrypted payment credentials provided by Apple Pay, Google Pay, etc.
+                                </p>
+                            </div>
+                        </div>
+
                         <!-- ACH Specific Fields -->
                         <div id="achFields" style="display: none;">
                             <div class="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3 mb-4">
@@ -124,16 +193,6 @@
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Email</label>
                                 <input type="email" id="email" value="john.smith@test.com" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-
-                            <div class="mt-4">
-                                <label class="block text-sm font-medium mb-1 text-blue-200">Country</label>
-                                <select id="country" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="US">United States (ACH)</option>
-                                    <option value="GB">United Kingdom (SWIFT)</option>
-                                    <option value="DE">Germany (SWIFT)</option>
-                                    <option value="AU">Australia (SWIFT)</option>
-                                </select>
                             </div>
 
                             <div class="mt-4">
@@ -172,18 +231,22 @@
             </div>
 
             <!-- Footer Info -->
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-blue-500/20 rounded-lg p-4 border border-blue-500/40">
                     <h3 class="font-bold mb-2 text-blue-200">Card Payouts</h3>
-                    <p class="text-sm text-gray-300">Single API call. Instant setup. Auto FX conversion.</p>
+                    <p class="text-sm text-gray-300">Direct card payouts with optional MCP conversion.</p>
+                </div>
+                <div class="bg-purple-500/20 rounded-lg p-4 border border-purple-500/40">
+                    <h3 class="font-bold mb-2 text-purple-200">Digital Wallets</h3>
+                    <p class="text-sm text-gray-300">Apple Pay, Google Pay, Samsung Pay support.</p>
                 </div>
                 <div class="bg-green-500/20 rounded-lg p-4 border border-green-500/40">
-                    <h3 class="font-bold mb-2 text-green-200">Closed Loop (Existing)</h3>
-                    <p class="text-sm text-gray-300">One API call with stored UPO ID. Fastest flow.</p>
+                    <h3 class="font-bold mb-2 text-green-200">Closed Loop</h3>
+                    <p class="text-sm text-gray-300">One API call with stored UPO ID.</p>
                 </div>
                 <div class="bg-yellow-500/20 rounded-lg p-4 border border-yellow-500/40">
-                    <h3 class="font-bold mb-2 text-yellow-200">Open Loop (New User)</h3>
-                    <p class="text-sm text-gray-300">3 API calls: createUser → addUPOAPM → payout</p>
+                    <h3 class="font-bold mb-2 text-yellow-200">Open Loop</h3>
+                    <p class="text-sm text-gray-300">3 APIs: createUser → addUPOAPM → payout</p>
                 </div>
             </div>
         </div>
@@ -193,22 +256,59 @@
         let currentTab = 'card';
         let processing = false;
 
+        const fxRates = {
+            'US': { currency: 'USD', rate: 1.00, symbol: '$' },
+            'GB': { currency: 'GBP', rate: 0.79, symbol: '£' },
+            'EU': { currency: 'EUR', rate: 0.92, symbol: '€' },
+            'AU': { currency: 'AUD', rate: 1.52, symbol: 'A$' },
+            'CA': { currency: 'CAD', rate: 1.36, symbol: 'C$' },
+            'JP': { currency: 'JPY', rate: 149.50, symbol: '¥' }
+        };
+
         function switchTab(tab) {
             currentTab = tab;
             
             const cardTab = document.getElementById('cardTab');
+            const walletTab = document.getElementById('walletTab');
             const achTab = document.getElementById('achTab');
             
+            cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
+            walletTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
+            achTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
+            
+            document.getElementById('cardFields').style.display = 'none';
+            document.getElementById('walletFields').style.display = 'none';
+            document.getElementById('achFields').style.display = 'none';
+            
             if (tab === 'card') {
-                cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg';
-                achTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10';
+                cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('cardFields').style.display = 'block';
-                document.getElementById('achFields').style.display = 'none';
+            } else if (tab === 'wallet') {
+                walletTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
+                document.getElementById('walletFields').style.display = 'block';
             } else {
-                achTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg';
-                cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10';
-                document.getElementById('cardFields').style.display = 'none';
+                achTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('achFields').style.display = 'block';
+            }
+            
+            updateFXPreview();
+        }
+
+        function updateFXPreview() {
+            const country = document.getElementById('traderCountry').value;
+            const amountUSD = parseFloat(document.getElementById('amountUSD').value) || 0;
+            const settlementType = document.querySelector('input[name="settlementType"]:checked').value;
+            const fxPreview = document.getElementById('fxPreview');
+            
+            if (settlementType === 'local' && country !== 'US') {
+                const fx = fxRates[country];
+                const convertedAmt = (amountUSD * fx.rate).toFixed(2);
+                
+                document.getElementById('fxRate').textContent = `1 USD = ${fx.rate} ${fx.currency}`;
+                document.getElementById('convertedAmount').textContent = `${fx.symbol}${convertedAmt} ${fx.currency}`;
+                fxPreview.classList.remove('hidden');
+            } else {
+                fxPreview.classList.add('hidden');
             }
         }
 
@@ -220,6 +320,7 @@
             if (type === 'success') color = 'text-green-400';
             if (type === 'api') color = 'text-blue-400';
             if (type === 'warning') color = 'text-yellow-400';
+            if (type === 'fx') color = 'text-amber-400';
             
             const logEntry = document.createElement('div');
             logEntry.className = 'mb-2 flex items-start gap-2 log-entry';
@@ -238,68 +339,50 @@
 
         async function simulateCardPayout() {
             const cardNumber = document.getElementById('cardNumber').value;
-            const amount = document.getElementById('amount').value;
-            
-            const steps = [
-                { msg: 'Trader requested payout from dashboard', delay: 500 },
-                { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' },
-                { msg: 'Initiating Nuvei Card Payout API...', delay: 600 },
-                { msg: 'POST /payout.do', delay: 400, type: 'api' },
-                { msg: `Payload: cardNumber: ****${cardNumber.slice(-4)}, amount: ${amount} USD`, delay: 400, type: 'api' },
-                { msg: 'Nuvei processing USD → EUR conversion...', delay: 1200 },
-                { msg: 'FX Rate applied: 1 USD = 0.92 EUR (example)', delay: 600 },
-                { msg: '✓ Card payout successful', delay: 800, type: 'success' },
-                { msg: `€${(parseFloat(amount) * 0.92).toFixed(2)} delivered to trader's card`, delay: 400, type: 'success' }
-            ];
-
-            for (const step of steps) {
-                await sleep(step.delay);
-                addLog(step.msg, step.type);
-            }
-        }
-
-        async function simulateACHPayout() {
-            const flowType = document.querySelector('input[name="flowType"]:checked').value;
-            const email = document.getElementById('email').value;
-            const amount = document.getElementById('amount').value;
-            const country = document.getElementById('country').value;
-            const accountNumber = document.getElementById('accountNumber').value;
-            const routingNumber = document.getElementById('routingNumber').value;
-            const isOpenLoop = flowType === 'new';
+            const amountUSD = document.getElementById('amountUSD').value;
+            const country = document.getElementById('traderCountry').value;
+            const settlementType = document.querySelector('input[name="settlementType"]:checked').value;
+            const fx = fxRates[country];
             
             let steps = [
                 { msg: 'Trader requested payout from dashboard', delay: 500 },
                 { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' },
+                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
             ];
 
-            if (isOpenLoop) {
+            if (settlementType === 'local' && country !== 'US') {
                 steps.push(
-                    { msg: 'OPEN LOOP: New user detected', delay: 600, type: 'warning' },
-                    { msg: 'Step 1: POST /createUser.do', delay: 500, type: 'api' },
-                    { msg: `Creating user: ${email}`, delay: 400, type: 'api' },
-                    { msg: '✓ Received userTokenId: TESTACH2', delay: 600, type: 'success' },
-                    { msg: 'Step 2: POST /addUPOAPM.do', delay: 500, type: 'api' },
-                    { msg: 'Payment Method: apmgw_ACH', delay: 400, type: 'api' },
-                    { msg: `Account: ****${accountNumber.slice(-4)}, Routing: ${routingNumber}`, delay: 400, type: 'api' },
-                    { msg: '✓ Received UPO ID: 3491216111', delay: 800, type: 'success' }
-                );
-            } else {
-                steps.push(
-                    { msg: 'CLOSED LOOP: Existing user with UPO ID', delay: 600, type: 'success' },
-                    { msg: 'Using stored UPO ID: 3491216111', delay: 400, type: 'api' }
+                    { msg: '💱 Currency conversion requested - Calling /getMCPRates', delay: 600, type: 'fx' },
+                    { msg: `GET /getMCPRates?fromCurrency=USD&toCurrency=${fx.currency}`, delay: 400, type: 'api' },
+                    { msg: `✓ Rate received: 1 USD = ${fx.rate} ${fx.currency}`, delay: 600, type: 'fx' },
+                    { msg: `Original: $${amountUSD} USD → Converted: ${fx.symbol}${(parseFloat(amountUSD) * fx.rate).toFixed(2)} ${fx.currency}`, delay: 400, type: 'fx' }
                 );
             }
 
             steps.push(
-                { msg: 'Step 3: POST /payout.do', delay: 500, type: 'api' },
-                { msg: `Initiating ${country === 'US' ? 'ACH' : 'SWIFT'} transfer...`, delay: 600, type: 'api' },
-                { msg: `Amount: ${amount} USD`, delay: 400, type: 'api' },
-                { msg: 'Nuvei processing bank transfer...', delay: 1200 },
-                { msg: country === 'US' ? '✓ ACH transfer initiated' : '✓ SWIFT transfer initiated (USD → Local Currency)', delay: 800, type: 'success' },
-                { msg: `${amount} USD ${country === 'US' ? 'delivered' : 'converted and delivered'} to trader's account`, delay: 400, type: 'success' }
+                { msg: 'Initiating Nuvei Card Payout API...', delay: 600 },
+                { msg: 'POST /payout.do', delay: 400, type: 'api' }
             );
+
+            if (settlementType === 'local' && country !== 'US') {
+                const convertedAmt = (parseFloat(amountUSD) * fx.rate).toFixed(2);
+                steps.push(
+                    { msg: `Payload: currency: "${fx.currency}", amount: "${convertedAmt}"`, delay: 400, type: 'api' },
+                    { msg: `currencyConversion: { type: "MCP", originalAmount: "${amountUSD}", originalCurrency: "USD" }`, delay: 400, type: 'api' },
+                    { msg: `cardNumber: ****${cardNumber.slice(-4)}`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing MCP conversion...', delay: 1200 },
+                    { msg: '✓ Card payout successful', delay: 800, type: 'success' },
+                    { msg: `${fx.symbol}${convertedAmt} ${fx.currency} delivered to trader's card`, delay: 400, type: 'success' }
+                );
+            } else {
+                steps.push(
+                    { msg: `Payload: currency: "USD", amount: "${amountUSD}"`, delay: 400, type: 'api' },
+                    { msg: `cardNumber: ****${cardNumber.slice(-4)}`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing payout...', delay: 1200 },
+                    { msg: '✓ Card payout successful', delay: 800, type: 'success' },
+                    { msg: `$${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
+                );
+            }
 
             for (const step of steps) {
                 await sleep(step.delay);
@@ -307,36 +390,22 @@
             }
         }
 
-        async function executePayout() {
-            if (processing) return;
+        async function simulateWalletPayout() {
+            const walletProvider = document.getElementById('walletProvider').value;
+            const amountUSD = document.getElementById('amountUSD').value;
+            const country = document.getElementById('traderCountry').value;
+            const settlementType = document.querySelector('input[name="settlementType"]:checked').value;
+            const fx = fxRates[country];
+            const mobileToken = document.getElementById('mobileToken').value.substring(0, 30) + '...';
             
-            processing = true;
-            const btn = document.getElementById('executeBtn');
-            const originalHTML = btn.innerHTML;
-            
-            btn.disabled = true;
-            btn.innerHTML = `
-                <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processing...
-            `;
-            
-            document.getElementById('logContainer').innerHTML = '';
-            
-            try {
-                if (currentTab === 'card') {
-                    await simulateCardPayout();
-                } else {
-                    await simulateACHPayout();
-                }
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHTML;
-                processing = false;
-            }
-        }
-    </script>
-</body>
-</html>
+            let steps = [
+                { msg: 'Trader requested payout from dashboard', delay: 500 },
+                { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
+                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
+            ];
+
+            if (settlementType === 'local' && country !== 'US') {
+                steps.push(
+                    { msg: '💱 Currency conversion requested - Calling /getMCPRates', delay: 600, type: 'fx' },
+                    { msg: `GET /getMCPRates?fromCurrency=USD&toCurrency=${fx.currency}`, delay: 400, type: 'api' },
+                    { msg: `✓ Rate received: 1 USD = ${fx.rate} ${fx.currency}`, delay: 600, type:
