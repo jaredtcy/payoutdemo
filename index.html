@@ -355,6 +355,151 @@
                     { msg: '💱 Currency conversion requested - Calling /getMCPRates', delay: 600, type: 'fx' },
                     { msg: `GET /getMCPRates?fromCurrency=USD&toCurrency=${fx.currency}`, delay: 400, type: 'api' },
                     { msg: `✓ Rate received: 1 USD = ${fx.rate} ${fx.currency}`, delay: 600, type: 'fx' },
+                    { msg: `Original: ${amountUSD} USD → Converted: ${fx.symbol}${(parseFloat(amountUSD) * fx.rate).toFixed(2)} ${fx.currency}`, delay: 400, type: 'fx' }
+                );
+            }
+
+            steps.push(
+                { msg: `Initiating ${walletProvider} Payout...`, delay: 600 },
+                { msg: 'POST /payout.do', delay: 400, type: 'api' },
+                { msg: `Payload: externalTokenProvider: "${walletProvider}"`, delay: 400, type: 'api' },
+                { msg: `mobileToken: "${mobileToken}"`, delay: 400, type: 'api' }
+            );
+
+            if (settlementType === 'local' && country !== 'US') {
+                const convertedAmt = (parseFloat(amountUSD) * fx.rate).toFixed(2);
+                steps.push(
+                    { msg: `currency: "${fx.currency}", amount: "${convertedAmt}"`, delay: 400, type: 'api' },
+                    { msg: `currencyConversion: { type: "MCP", originalAmount: "${amountUSD}", originalCurrency: "USD" }`, delay: 400, type: 'api' },
+                    { msg: `Processing ${walletProvider} payment with MCP...`, delay: 1200 },
+                    { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
+                    { msg: `${fx.symbol}${convertedAmt} ${fx.currency} delivered via ${walletProvider}`, delay: 400, type: 'success' }
+                );
+            } else {
+                steps.push(
+                    { msg: `currency: "USD", amount: "${amountUSD}"`, delay: 400, type: 'api' },
+                    { msg: `Processing ${walletProvider} payment...`, delay: 1200 },
+                    { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
+                    { msg: `${amountUSD} USD delivered via ${walletProvider}`, delay: 400, type: 'success' }
+                );
+            }
+
+            for (const step of steps) {
+                await sleep(step.delay);
+                addLog(step.msg, step.type);
+            }
+        }
+
+        async function simulateACHPayout() {
+            const flowType = document.querySelector('input[name="flowType"]:checked').value;
+            const email = document.getElementById('email').value;
+            const amountUSD = document.getElementById('amountUSD').value;
+            const country = document.getElementById('traderCountry').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const routingNumber = document.getElementById('routingNumber').value;
+            const isOpenLoop = flowType === 'new';
+            const settlementType = document.querySelector('input[name="settlementType"]:checked').value;
+            const fx = fxRates[country];
+            
+            let steps = [
+                { msg: 'Trader requested payout from dashboard', delay: 500 },
+                { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
+                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' },
+            ];
+
+            if (isOpenLoop) {
+                steps.push(
+                    { msg: 'OPEN LOOP: New user detected', delay: 600, type: 'warning' },
+                    { msg: 'Step 1: POST /createUser.do', delay: 500, type: 'api' },
+                    { msg: `Creating user: ${email}`, delay: 400, type: 'api' },
+                    { msg: '✓ Received userTokenId: TESTACH2', delay: 600, type: 'success' },
+                    { msg: 'Step 2: POST /addUPOAPM.do', delay: 500, type: 'api' },
+                    { msg: 'Payment Method: apmgw_ACH', delay: 400, type: 'api' },
+                    { msg: `Account: ****${accountNumber.slice(-4)}, Routing: ${routingNumber}`, delay: 400, type: 'api' },
+                    { msg: '✓ Received UPO ID: 3491216111', delay: 800, type: 'success' }
+                );
+            } else {
+                steps.push(
+                    { msg: 'CLOSED LOOP: Existing user with UPO ID', delay: 600, type: 'success' },
+                    { msg: 'Using stored UPO ID: 3491216111', delay: 400, type: 'api' }
+                );
+            }
+
+            if (settlementType === 'local' && country !== 'US') {
+                steps.push(
+                    { msg: '💱 Currency conversion requested - Calling /getMCPRates', delay: 600, type: 'fx' },
+                    { msg: `GET /getMCPRates?fromCurrency=USD&toCurrency=${fx.currency}`, delay: 400, type: 'api' },
+                    { msg: `✓ Rate received: 1 USD = ${fx.rate} ${fx.currency}`, delay: 600, type: 'fx' }
+                );
+            }
+
+            steps.push({ msg: 'Step 3: POST /payout.do', delay: 500, type: 'api' });
+
+            if (settlementType === 'local' && country !== 'US') {
+                const convertedAmt = (parseFloat(amountUSD) * fx.rate).toFixed(2);
+                steps.push(
+                    { msg: `Payload: currency: "${fx.currency}", amount: "${convertedAmt}"`, delay: 400, type: 'api' },
+                    { msg: `currencyConversion: { type: "MCP", originalAmount: "${amountUSD}", originalCurrency: "USD" }`, delay: 400, type: 'api' },
+                    { msg: 'Initiating SWIFT transfer with MCP conversion...', delay: 600, type: 'api' },
+                    { msg: 'Nuvei processing bank transfer...', delay: 1200 },
+                    { msg: '✓ SWIFT transfer initiated with currency conversion', delay: 800, type: 'success' },
+                    { msg: `${fx.symbol}${convertedAmt} ${fx.currency} delivered to trader's account`, delay: 400, type: 'success' }
+                );
+            } else {
+                const transferType = country === 'US' ? 'ACH' : 'SWIFT';
+                steps.push(
+                    { msg: `Initiating ${transferType} transfer...`, delay: 600, type: 'api' },
+                    { msg: `Amount: ${amountUSD} USD`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing bank transfer...', delay: 1200 },
+                    { msg: `✓ ${transferType} transfer initiated`, delay: 800, type: 'success' },
+                    { msg: `${amountUSD} USD delivered to trader's account`, delay: 400, type: 'success' }
+                );
+            }
+
+            for (const step of steps) {
+                await sleep(step.delay);
+                addLog(step.msg, step.type);
+            }
+        }
+
+        async function executePayout() {
+            if (processing) return;
+            
+            processing = true;
+            const btn = document.getElementById('executeBtn');
+            const originalHTML = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+            `;
+            
+            document.getElementById('logContainer').innerHTML = '';
+            
+            try {
+                if (currentTab === 'card') {
+                    await simulateCardPayout();
+                } else if (currentTab === 'wallet') {
+                    await simulateWalletPayout();
+                } else {
+                    await simulateACHPayout();
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                processing = false;
+            }
+        }
+
+        // Initialize FX preview on page load
+        updateFXPreview();
+    </script>
+</body>
+</html>'fx' },
                     { msg: `Original: $${amountUSD} USD → Converted: ${fx.symbol}${(parseFloat(amountUSD) * fx.rate).toFixed(2)} ${fx.currency}`, delay: 400, type: 'fx' }
                 );
             }
