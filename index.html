@@ -34,7 +34,6 @@
 <body class="text-white">
     <div class="min-h-screen p-6">
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
             <div class="text-center mb-8">
                 <h1 class="text-4xl md:text-5xl font-bold mb-2">Take Profit Trader</h1>
                 <p class="text-blue-300 text-lg md:text-xl">Nuvei International Payout Demo</p>
@@ -47,7 +46,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Left Panel - Configuration -->
                 <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                     <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
                         <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +54,6 @@
                         Payout Configuration
                     </h2>
 
-                    <!-- Tabs -->
                     <div class="flex gap-2 mb-6">
                         <button id="cardTab" onclick="switchTab('card')" class="flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +76,6 @@
                     </div>
 
                     <div class="space-y-4">
-                        <!-- Common Fields -->
                         <div>
                             <label class="block text-sm font-medium mb-1 text-blue-200">Trader Name</label>
                             <input type="text" id="traderName" value="John Smith" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -103,7 +99,6 @@
                             </div>
                         </div>
 
-                        <!-- Currency Conversion Options -->
                         <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-lg p-4">
                             <label class="block text-sm font-medium mb-2 text-amber-200">💱 Currency Settlement</label>
                             <div class="space-y-2">
@@ -129,7 +124,6 @@
                             </div>
                         </div>
 
-                        <!-- Card Specific Fields -->
                         <div id="cardFields">
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Card Number</label>
@@ -150,7 +144,6 @@
                             </div>
                         </div>
 
-                        <!-- Digital Wallet Fields -->
                         <div id="walletFields" style="display: none;">
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Wallet Provider</label>
@@ -174,7 +167,6 @@
                             </div>
                         </div>
 
-                        <!-- ACH Specific Fields -->
                         <div id="achFields" style="display: none;">
                             <div class="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3 mb-4">
                                 <p class="text-sm font-medium text-yellow-200 mb-2">Flow Type</p>
@@ -215,7 +207,6 @@
                     </div>
                 </div>
 
-                <!-- Right Panel - Live Log -->
                 <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                     <h2 class="text-2xl font-bold mb-4">Live Transaction Log</h2>
                     
@@ -230,7 +221,6 @@
                 </div>
             </div>
 
-            <!-- Footer Info -->
             <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-blue-500/20 rounded-lg p-4 border border-blue-500/40">
                     <h3 class="font-bold mb-2 text-blue-200">Card Payouts</h3>
@@ -408,4 +398,146 @@
                 steps.push(
                     { msg: '💱 Currency conversion requested - Calling /getMCPRates', delay: 600, type: 'fx' },
                     { msg: `GET /getMCPRates?fromCurrency=USD&toCurrency=${fx.currency}`, delay: 400, type: 'api' },
-                    { msg:
+                    { msg: `✓ Rate received: 1 USD = ${fx.rate} ${fx.currency}`, delay: 600, type: 'fx' },
+                    { msg: `Original: $${amountUSD} USD → Converted: ${fx.symbol}${(parseFloat(amountUSD) * fx.rate).toFixed(2)} ${fx.currency}`, delay: 400, type: 'fx' }
+                );
+            }
+
+            steps.push(
+                { msg: `Initiating ${walletProvider} Payout...`, delay: 600 },
+                { msg: 'POST /payout.do', delay: 400, type: 'api' },
+                { msg: `Payload: paymentMethod: "${walletProvider}"`, delay: 400, type: 'api' },
+                { msg: `mobileToken: "${mobileToken}"`, delay: 400, type: 'api' }
+            );
+
+            if (settlementType === 'local' && country !== 'US') {
+                const convertedAmt = (parseFloat(amountUSD) * fx.rate).toFixed(2);
+                steps.push(
+                    { msg: `currency: "${fx.currency}", amount: "${convertedAmt}"`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing wallet payout with MCP...', delay: 1500 },
+                    { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
+                    { msg: `${fx.symbol}${convertedAmt} ${fx.currency} delivered to ${walletProvider}`, delay: 400, type: 'success' }
+                );
+            } else {
+                steps.push(
+                    { msg: `currency: "USD", amount: "${amountUSD}"`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing wallet payout...', delay: 1500 },
+                    { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
+                    { msg: `$${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
+                );
+            }
+
+            for (const step of steps) {
+                await sleep(step.delay);
+                addLog(step.msg, step.type);
+            }
+        }
+
+        async function simulateACHPayout() {
+            const email = document.getElementById('email').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const routingNumber = document.getElementById('routingNumber').value;
+            const amountUSD = document.getElementById('amountUSD').value;
+            const country = document.getElementById('traderCountry').value;
+            const settlementType = document.querySelector('input[name="settlementType"]:checked').value;
+            const flowType = document.querySelector('input[name="flowType"]:checked').value;
+            const fx = fxRates[country];
+            
+            let steps = [
+                { msg: 'Trader requested payout from dashboard', delay: 500 },
+                { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
+                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
+            ];
+
+            if (flowType === 'new') {
+                steps.push(
+                    { msg: '🔄 Open Loop Flow - New user detected', delay: 600, type: 'warning' },
+                    { msg: 'STEP 1: Creating User Account', delay: 400 },
+                    { msg: 'POST /createUser', delay: 400, type: 'api' },
+                    { msg: `Payload: { email: "${email}" }`, delay: 400, type: 'api' },
+                    { msg: '✓ User created - userId: USR_12345', delay: 800, type: 'success' },
+                    { msg: 'STEP 2: Adding Bank Account (UPO)', delay: 600 },
+                    { msg: 'POST /addUPOAPM', delay: 400, type: 'api' },
+                    { msg: `Payload: { userId: "USR_12345", apmMethod: "apmgw_ACH" }`, delay: 400, type: 'api' },
+                    { msg: `accountNumber: "****${accountNumber.slice(-4)}"`, delay: 400, type: 'api' },
+                    { msg: `routingNumber: "${routingNumber}"`, delay: 400, type: 'api' },
+                    { msg: '✓ UPO created - upoId: UPO_67890', delay: 1000, type: 'success' }
+                );
+            } else {
+                steps.push(
+                    { msg: '✓ Closed Loop Flow - Using stored UPO', delay: 600, type: 'success' },
+                    { msg: 'Retrieved: upoId: UPO_67890', delay: 400, type: 'api' }
+                );
+            }
+
+            if (settlementType === 'local' && country !== 'US') {
+                steps.push(
+                    { msg: '💱 Currency conversion requested - Calling /getMCPRates', delay: 600, type: 'fx' },
+                    { msg: `GET /getMCPRates?fromCurrency=USD&toCurrency=${fx.currency}`, delay: 400, type: 'api' },
+                    { msg: `✓ Rate received: 1 USD = ${fx.rate} ${fx.currency}`, delay: 600, type: 'fx' },
+                    { msg: `Original: $${amountUSD} USD → Converted: ${fx.symbol}${(parseFloat(amountUSD) * fx.rate).toFixed(2)} ${fx.currency}`, delay: 400, type: 'fx' }
+                );
+            }
+
+            steps.push(
+                { msg: `STEP ${flowType === 'new' ? '3' : '1'}: Executing Payout`, delay: 600 },
+                { msg: 'POST /payout', delay: 400, type: 'api' },
+                { msg: `Payload: { userPaymentOptionId: "UPO_67890" }`, delay: 400, type: 'api' }
+            );
+
+            if (settlementType === 'local' && country !== 'US') {
+                const convertedAmt = (parseFloat(amountUSD) * fx.rate).toFixed(2);
+                steps.push(
+                    { msg: `currency: "${fx.currency}", amount: "${convertedAmt}"`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing ACH payout with MCP...', delay: 1500 },
+                    { msg: '✓ ACH payout successful', delay: 1000, type: 'success' },
+                    { msg: `${fx.symbol}${convertedAmt} ${fx.currency} will arrive in 3-5 business days`, delay: 400, type: 'success' }
+                );
+            } else {
+                steps.push(
+                    { msg: `currency: "USD", amount: "${amountUSD}"`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing ACH payout...', delay: 1500 },
+                    { msg: '✓ ACH payout successful', delay: 1000, type: 'success' },
+                    { msg: `$${amountUSD} USD will arrive in 3-5 business days`, delay: 400, type: 'success' }
+                );
+            }
+
+            for (const step of steps) {
+                await sleep(step.delay);
+                addLog(step.msg, step.type);
+            }
+        }
+
+        async function executePayout() {
+            if (processing) return;
+            
+            processing = true;
+            const btn = document.getElementById('executeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Processing...';
+            
+            const container = document.getElementById('logContainer');
+            container.innerHTML = '';
+            
+            addLog('=== PAYOUT INITIATED ===', 'warning');
+            
+            if (currentTab === 'card') {
+                await simulateCardPayout();
+            } else if (currentTab === 'wallet') {
+                await simulateWalletPayout();
+            } else {
+                await simulateACHPayout();
+            }
+            
+            await sleep(500);
+            addLog('=== TRANSACTION COMPLETE ===', 'success');
+            
+            processing = false;
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Execute Payout';
+        }
+
+        updateFXPreview();
+    </script>
+</body>
+</html>
