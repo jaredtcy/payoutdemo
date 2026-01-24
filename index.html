@@ -238,25 +238,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-blue-500/20 rounded-lg p-4 border border-blue-500/40">
-                    <h3 class="font-bold mb-2 text-blue-200">Card Payouts</h3>
-                    <p class="text-sm text-gray-300">Direct card payouts with optional MCP conversion.</p>
-                </div>
-                <div class="bg-purple-500/20 rounded-lg p-4 border border-purple-500/40">
-                    <h3 class="font-bold mb-2 text-purple-200">Digital Wallets</h3>
-                    <p class="text-sm text-gray-300">Apple Pay and Google Pay support.</p>
-                </div>
-                <div class="bg-green-500/20 rounded-lg p-4 border border-green-500/40">
-                    <h3 class="font-bold mb-2 text-green-200">Closed Loop</h3>
-                    <p class="text-sm text-gray-300">One API call with stored UPO ID.</p>
-                </div>
-                <div class="bg-yellow-500/20 rounded-lg p-4 border border-yellow-500/40">
-                    <h3 class="font-bold mb-2 text-yellow-200">Open Loop</h3>
-                    <p class="text-sm text-gray-300">3 APIs: createUser → addUPOAPM → payout</p>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -480,63 +461,50 @@
             } else {
                 const payoutPayload = `{
     "sessionToken": "{{sessionToken}}",
-    "merchantId": "{{merchantId}}",
-    "merchantSiteId": "{{merchantSiteId}}",
-    "clientRequestId": "{{clientRequestId}}",
-    "clientUniqueId": "{{clientUniqueId}}",
+    "merchantId": "8631702020260252034",
+    "merchantSiteId": "242828",
+    "clientUniqueId": "TESTCARDS1",
     "userTokenId": "TESTCARDS1",
-    "cardData": { 
-        "cardNumber": "${cardNumber}",
-        "cardHolderName": "${traderName}",
-        "expirationMonth": "${expiryMonth}",
-        "expirationYear": "${expiryYear}",
-        "CVV": "${cvv}"
+    "userPaymentOption": {
+        "userPaymentOptionId": "3491216111"
     },
     "currency": "USD",
     "amount": "${amountUSD}",
     "deviceDetails": {
         "ipAddress": "127.0.0.1"
     },
-    "timeStamp": "{{timestamp}}",
+    "timeStamp": "20260123204724",
     "checksum": "{{checksum}}"
 }`;
 
                 const payoutResponse = `{
-    "internalRequestId": 115131018111,
+    "internalRequestId": 115137577111,
     "status": "SUCCESS",
     "errCode": 0,
     "reason": "",
     "merchantId": "8631702020260252034",
     "merchantSiteId": "242828",
     "version": "1.0",
-    "clientRequestId": "20260123140058",
-    "userTokenId": "TESTACH1",
-    "clientUniqueId": "20180327175242",
+    "userTokenId": "TESTCARDS1",
+    "clientUniqueId": "TESTCARDS1",
     "transactionStatus": "APPROVED",
-    "gwErrorCode": 0,
-    "gwExtendedErrorCode": 0,
-    "userPaymentOptionId": "3491194111",
-    "externalTransactionId": "",
-    "transactionId": "8110000000023228836",
-    "cardData": {
-        "acquirerId": "19",
-        "visaDirect": "NO",
-        "processedBrand": "VISA"
-    },
-    "merchantAdviceCode": "",
-    "orderId": "12754131111",
-    "isFastFunds": "0"
+    "paymentMethodErrorCode": "0",
+    "userPaymentOptionId": "3491216111",
+    "externalTransactionId": "8110000000688460",
+    "transactionId": "8110000000023229654",
+    "orderId": "12754284111"
 }`;
 
                 steps.push(
                     { msg: '✓ USD Flow - No currency conversion', delay: 600, type: 'success' },
                     { msg: 'STEP 1: Executing Card Payout', delay: 600 },
+                    { msg: 'UPO detected - UPOID: 3491216111', delay: 400, type: 'api' },
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing card payout...', delay: 1500 },
                     { msg: '✓ Card payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `$${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
+                    { msg: `${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
                 );
             }
 
