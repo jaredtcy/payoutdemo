@@ -186,7 +186,18 @@
                                 </div>
                             </div>
 
-                            <div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-blue-200">First Name</label>
+                                    <input type="text" id="firstName" value="John" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-blue-200">Last Name</label>
+                                    <input type="text" id="lastName" value="Smith" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Email</label>
                                 <input type="email" id="email" value="john.smith@test.com" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
@@ -413,6 +424,8 @@
         }
 
         async function simulateACHPayout() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
             const email = document.getElementById('email').value;
             const accountNumber = document.getElementById('accountNumber').value;
             const routingNumber = document.getElementById('routingNumber').value;
@@ -430,7 +443,7 @@
                     { msg: '🔄 Open Loop Flow - New user detected', delay: 600, type: 'warning' },
                     { msg: 'STEP 1: Creating User Account', delay: 400 },
                     { msg: 'POST /createUser', delay: 400, type: 'api' },
-                    { msg: `Payload: { email: "${email}" }`, delay: 400, type: 'api' },
+                    { msg: `Payload: { firstName: "${firstName}", lastName: "${lastName}", email: "${email}" }`, delay: 400, type: 'api' },
                     { msg: '✓ User created - userId: USR_12345', delay: 800, type: 'success' },
                     { msg: 'STEP 2: Adding Bank Account (UPO)', delay: 600 },
                     { msg: 'POST /addUPOAPM', delay: 400, type: 'api' },
@@ -453,7 +466,7 @@
                 { msg: `currency: "USD", amount: "${amountUSD}"`, delay: 400, type: 'api' },
                 { msg: 'Nuvei processing ACH payout...', delay: 1500 },
                 { msg: '✓ ACH payout successful', delay: 1000, type: 'success' },
-                { msg: `$${amountUSD} USD will arrive in 3-5 business days`, delay: 400, type: 'success' }
+                { msg: `${amountUSD} USD will arrive in 3-5 business days`, delay: 400, type: 'success' }
             );
 
             for (const step of steps) {
