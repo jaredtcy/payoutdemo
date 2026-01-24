@@ -76,6 +76,7 @@
                     </div>
 
                     <div class="space-y-4">
+                        <!-- Common Fields -->
                         <div>
                             <label class="block text-sm font-medium mb-1 text-blue-200">Trader Name</label>
                             <input type="text" id="traderName" value="John Smith" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -99,32 +100,34 @@
                             </div>
                         </div>
 
-                        <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-lg p-4">
-                            <label class="block text-sm font-medium mb-2 text-amber-200">💱 Currency Settlement</label>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="settlementType" value="usd" checked onchange="updateFXPreview()" class="w-4 h-4">
-                                    <span class="text-sm">Pay in USD (No conversion - Trader handles FX)</span>
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="settlementType" value="local" onchange="updateFXPreview()" class="w-4 h-4">
-                                    <span class="text-sm">Pay in Local Currency (Nuvei MCP conversion)</span>
-                                </label>
-                            </div>
-                            <div id="fxPreview" class="mt-3 p-3 bg-black/30 rounded-lg hidden">
-                                <div class="text-xs text-gray-400 mb-1">Live FX Rate Preview:</div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm">Rate:</span>
-                                    <span id="fxRate" class="font-mono fx-highlight"></span>
-                                </div>
-                                <div class="flex items-center justify-between mt-1">
-                                    <span class="text-sm">Trader Receives:</span>
-                                    <span id="convertedAmount" class="font-mono text-green-400 font-bold"></span>
-                                </div>
-                            </div>
-                        </div>
-
+                        <!-- Card Specific Fields -->
                         <div id="cardFields">
+                            <!-- Currency Conversion Options (Card Only) -->
+                            <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-lg p-4 mb-4">
+                                <label class="block text-sm font-medium mb-2 text-amber-200">💱 Currency Settlement</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="settlementType" value="usd" checked onchange="updateFXPreview()" class="w-4 h-4">
+                                        <span class="text-sm">Pay in USD (No conversion - Trader handles FX)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="settlementType" value="local" onchange="updateFXPreview()" class="w-4 h-4">
+                                        <span class="text-sm">Pay in Local Currency (Nuvei MCP conversion)</span>
+                                    </label>
+                                </div>
+                                <div id="fxPreview" class="mt-3 p-3 bg-black/30 rounded-lg hidden">
+                                    <div class="text-xs text-gray-400 mb-1">Live FX Rate Preview:</div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm">Rate:</span>
+                                        <span id="fxRate" class="font-mono fx-highlight"></span>
+                                    </div>
+                                    <div class="flex items-center justify-between mt-1">
+                                        <span class="text-sm">Trader Receives:</span>
+                                        <span id="convertedAmount" class="font-mono text-green-400 font-bold"></span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Card Number</label>
                                 <input type="text" id="cardNumber" value="4000020951595032" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -144,6 +147,7 @@
                             </div>
                         </div>
 
+                        <!-- Digital Wallet Fields -->
                         <div id="walletFields" style="display: none;">
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Wallet Provider</label>
@@ -166,6 +170,7 @@
                             </div>
                         </div>
 
+                        <!-- ACH Specific Fields -->
                         <div id="achFields" style="display: none;">
                             <div class="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3 mb-4">
                                 <p class="text-sm font-medium text-yellow-200 mb-2">Flow Type</p>
@@ -260,7 +265,6 @@
             const cardTab = document.getElementById('cardTab');
             const walletTab = document.getElementById('walletTab');
             const achTab = document.getElementById('achTab');
-            const currencySettlement = document.getElementById('currencySettlement');
             
             // Reset all tab styles
             cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
@@ -276,15 +280,12 @@
             if (tab === 'card') {
                 cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('cardFields').style.display = 'block';
-                if (currencySettlement) currencySettlement.style.display = 'block';
             } else if (tab === 'wallet') {
                 walletTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('walletFields').style.display = 'block';
-                if (currencySettlement) currencySettlement.style.display = 'none';
             } else {
                 achTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('achFields').style.display = 'block';
-                if (currencySettlement) currencySettlement.style.display = 'none';
             }
             
             updateFXPreview();
@@ -293,17 +294,17 @@
         function updateFXPreview() {
             const country = document.getElementById('traderCountry').value;
             const amountUSD = parseFloat(document.getElementById('amountUSD').value) || 0;
-            const settlementType = document.querySelector('input[name="settlementType"]:checked').value;
+            const settlementType = document.querySelector('input[name="settlementType"]:checked');
             const fxPreview = document.getElementById('fxPreview');
             
-            if (settlementType === 'local' && country !== 'US') {
+            if (settlementType && settlementType.value === 'local' && country !== 'US') {
                 const fx = fxRates[country];
                 const convertedAmt = (amountUSD * fx.rate).toFixed(2);
                 
                 document.getElementById('fxRate').textContent = `1 USD = ${fx.rate} ${fx.currency}`;
                 document.getElementById('convertedAmount').textContent = `${fx.symbol}${convertedAmt} ${fx.currency}`;
                 fxPreview.classList.remove('hidden');
-            } else {
+            } else if (fxPreview) {
                 fxPreview.classList.add('hidden');
             }
         }
@@ -402,7 +403,7 @@
                 { msg: `currency: "USD", amount: "${amountUSD}"`, delay: 400, type: 'api' },
                 { msg: 'Nuvei processing wallet payout...', delay: 1500 },
                 { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
-                { msg: `${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
+                { msg: `$${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
             ];
 
             for (const step of steps) {
@@ -452,7 +453,7 @@
                 { msg: `currency: "USD", amount: "${amountUSD}"`, delay: 400, type: 'api' },
                 { msg: 'Nuvei processing ACH payout...', delay: 1500 },
                 { msg: '✓ ACH payout successful', delay: 1000, type: 'success' },
-                { msg: `${amountUSD} USD will arrive in 3-5 business days`, delay: 400, type: 'success' }
+                { msg: `$${amountUSD} USD will arrive in 3-5 business days`, delay: 400, type: 'success' }
             );
 
             for (const step of steps) {
@@ -492,7 +493,7 @@
 
         // Initialize on page load
         updateFXPreview();
-        switchTab('card'); // Ensure proper initial state
+        switchTab('card');
     </script>
 </body>
 </html>
