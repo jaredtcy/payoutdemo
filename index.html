@@ -156,8 +156,8 @@
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Wallet Provider</label>
                                 <select id="walletProvider" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="ApplePay">🍎 Apple Pay</option>
-                                    <option value="GooglePay">📱 Google Pay</option>
+                                    <option value="ApplePay"> Apple Pay</option>
+                                    <option value="GooglePay"> Google Pay</option>
                                 </select>
                             </div>
                             <div class="mt-4">
@@ -462,14 +462,13 @@
                 steps.push(
                     { msg: '✓ Existing UPO Flow - Using stored wallet UPO', delay: 600, type: 'success' },
                     { msg: 'Retrieved: userPaymentOptionId: 3491216112', delay: 400, type: 'api' },
-                    { msg: '', delay: 200 },
                     { msg: `STEP 1: Executing ${walletProvider} Payout`, delay: 600 },
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing wallet payout...', delay: 1500 },
                     { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
+                    { msg: `$${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
                 );
             } else {
                 const payoutPayload = `{
@@ -520,14 +519,13 @@
 
                 steps.push(
                     { msg: '🔄 No UPO Flow - Using external token', delay: 600, type: 'warning' },
-                    { msg: '', delay: 200 },
                     { msg: `STEP 1: Executing ${walletProvider} Payout`, delay: 600 },
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing wallet payout with external token...', delay: 1500 },
                     { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
+                    { msg: `$${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
                 );
             }
 
@@ -615,13 +613,11 @@
                     { msg: `Request Payload:\n${createUserPayload}`, delay: 400, type: 'api' },
                     { msg: '✓ User created', delay: 800, type: 'success' },
                     { msg: `Response:\n${createUserResponse}`, delay: 400, type: 'api' },
-                    { msg: '', delay: 200 },
                     { msg: 'STEP 2: Adding Bank Account (UPO)', delay: 600 },
                     { msg: 'POST /addUPOAPM', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${addUPOPayload}`, delay: 400, type: 'api' },
                     { msg: '✓ UPO created', delay: 1000, type: 'success' },
-                    { msg: `Response:\n${addUPOResponse}`, delay: 400, type: 'api' },
-                    { msg: '', delay: 200 }
+                    { msg: `Response:\n${addUPOResponse}`, delay: 400, type: 'api' }
                 );
             } else {
                 steps.push(
