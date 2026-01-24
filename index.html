@@ -261,6 +261,7 @@
             const cardTab = document.getElementById('cardTab');
             const walletTab = document.getElementById('walletTab');
             const achTab = document.getElementById('achTab');
+            const currencySettlement = document.getElementById('currencySettlement');
             
             cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
             walletTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
@@ -273,12 +274,15 @@
             if (tab === 'card') {
                 cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('cardFields').style.display = 'block';
+                currencySettlement.style.display = 'block';
             } else if (tab === 'wallet') {
                 walletTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('walletFields').style.display = 'block';
+                currencySettlement.style.display = 'none';
             } else {
                 achTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('achFields').style.display = 'block';
+                currencySettlement.style.display = 'none';
             }
             
             updateFXPreview();
