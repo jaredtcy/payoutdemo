@@ -76,7 +76,6 @@
                     </div>
 
                     <div class="space-y-4">
-                        <!-- Common Fields -->
                         <div>
                             <label class="block text-sm font-medium mb-1 text-blue-200">Trader Name</label>
                             <input type="text" id="traderName" value="John Smith" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -100,9 +99,7 @@
                             </div>
                         </div>
 
-                        <!-- Card Specific Fields -->
                         <div id="cardFields">
-                            <!-- Currency Conversion Options (Card Only) -->
                             <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-lg p-4 mb-4">
                                 <label class="block text-sm font-medium mb-2 text-amber-200">💱 Currency Settlement</label>
                                 <div class="space-y-2">
@@ -147,7 +144,6 @@
                             </div>
                         </div>
 
-                        <!-- Digital Wallet Fields -->
                         <div id="walletFields" style="display: none;">
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Wallet Provider</label>
@@ -170,7 +166,6 @@
                             </div>
                         </div>
 
-                        <!-- ACH Specific Fields -->
                         <div id="achFields" style="display: none;">
                             <div class="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3 mb-4">
                                 <p class="text-sm font-medium text-yellow-200 mb-2">Flow Type</p>
@@ -277,17 +272,14 @@
             const walletTab = document.getElementById('walletTab');
             const achTab = document.getElementById('achTab');
             
-            // Reset all tab styles
             cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
             walletTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
             achTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-white/5 hover:bg-white/10 text-sm';
             
-            // Hide all field sections
             document.getElementById('cardFields').style.display = 'none';
             document.getElementById('walletFields').style.display = 'none';
             document.getElementById('achFields').style.display = 'none';
             
-            // Show appropriate tab and fields
             if (tab === 'card') {
                 cardTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('cardFields').style.display = 'block';
@@ -331,10 +323,13 @@
             if (type === 'fx') color = 'text-amber-400';
             
             const logEntry = document.createElement('div');
-            logEntry.className = 'mb-2 flex items-start gap-2 log-entry';
+            logEntry.className = 'mb-3 flex items-start gap-2 log-entry';
+            
+            const formattedMessage = message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
             logEntry.innerHTML = `
-                <span class="text-gray-500 text-xs">${timestamp}</span>
-                <span class="flex-1 ${color}">${message}</span>
+                <span class="text-gray-500 text-xs whitespace-nowrap self-start mt-1">${timestamp}</span>
+                <pre class="flex-1 ${color} text-xs leading-relaxed overflow-x-auto">${formattedMessage}</pre>
             `;
             
             container.appendChild(logEntry);
@@ -439,34 +434,127 @@
             ];
 
             if (flowType === 'new') {
+                const createUserPayload = `{
+    "merchantSiteId": "242828",
+    "merchantId": "8631702020260252034",
+    "userTokenId": "TESTACH2",
+    "clientRequestId": "TESTACH",
+    "timeStamp": "20260123172519",
+    "firstName": "${firstName}",
+    "lastName": "${lastName}",
+    "email": "${email}",
+    "countryCode": "US",
+    "checksum": "{{checksum}}"
+}`;
+
+                const createUserResponse = `{
+    "internalRequestId": 115129733111,
+    "status": "SUCCESS",
+    "errCode": 0,
+    "reason": "",
+    "merchantId": "8631702020260252034",
+    "merchantSiteId": "242828",
+    "version": "1.0",
+    "clientRequestId": "20260123135549",
+    "userId": 4159813111
+}`;
+
+                const addUPOPayload = `{
+    "merchantId": "8631702020260252034",
+    "merchantSiteId": "242828",
+    "clientRequestId": "TESTACH",
+    "userTokenId": "TESTACH2",
+    "paymentMethodName": "apmgw_ACH",
+    "apmData": {
+        "AccountNumber": "${accountNumber}",
+        "RoutingNumber": "${routingNumber}"
+    },
+    "billingAddress": {
+        "countryCode": "US",
+        "email": "${email}"
+    },
+    "timeStamp": "20260110021015",
+    "checksum": "{{checksum}}"
+}`;
+
+                const addUPOResponse = `{
+    "internalRequestId": 115136088111,
+    "status": "SUCCESS",
+    "errCode": 0,
+    "reason": "",
+    "merchantId": "8631702020260252034",
+    "merchantSiteId": "242828",
+    "version": "1.0",
+    "clientRequestId": "test123",
+    "userPaymentOptionId": 3491216111
+}`;
+
                 steps.push(
                     { msg: '🔄 Open Loop Flow - New user detected', delay: 600, type: 'warning' },
                     { msg: 'STEP 1: Creating User Account', delay: 400 },
                     { msg: 'POST /createUser', delay: 400, type: 'api' },
-                    { msg: `Payload: { firstName: "${firstName}", lastName: "${lastName}", email: "${email}" }`, delay: 400, type: 'api' },
-                    { msg: '✓ User created - userId: USR_12345', delay: 800, type: 'success' },
+                    { msg: `Request Payload:\n${createUserPayload}`, delay: 400, type: 'api' },
+                    { msg: '✓ User created', delay: 800, type: 'success' },
+                    { msg: `Response:\n${createUserResponse}`, delay: 400, type: 'api' },
+                    { msg: '', delay: 200 },
                     { msg: 'STEP 2: Adding Bank Account (UPO)', delay: 600 },
                     { msg: 'POST /addUPOAPM', delay: 400, type: 'api' },
-                    { msg: `Payload: { userId: "USR_12345", apmMethod: "apmgw_ACH" }`, delay: 400, type: 'api' },
-                    { msg: `accountNumber: "****${accountNumber.slice(-4)}"`, delay: 400, type: 'api' },
-                    { msg: `routingNumber: "${routingNumber}"`, delay: 400, type: 'api' },
-                    { msg: '✓ UPO created - upoId: UPO_67890', delay: 1000, type: 'success' }
+                    { msg: `Request Payload:\n${addUPOPayload}`, delay: 400, type: 'api' },
+                    { msg: '✓ UPO created', delay: 1000, type: 'success' },
+                    { msg: `Response:\n${addUPOResponse}`, delay: 400, type: 'api' },
+                    { msg: '', delay: 200 }
                 );
             } else {
                 steps.push(
                     { msg: '✓ Closed Loop Flow - Using stored UPO', delay: 600, type: 'success' },
-                    { msg: 'Retrieved: upoId: UPO_67890', delay: 400, type: 'api' }
+                    { msg: 'Retrieved: userPaymentOptionId: 3491216111', delay: 400, type: 'api' }
                 );
             }
+
+            const payoutPayload = `{
+    "sessionToken": "{{sessionToken}}",
+    "merchantId": "8631702020260252034",
+    "merchantSiteId": "242828",
+    "clientUniqueId": "TESTACH",
+    "userTokenId": "TESTACH2",
+    "userPaymentOption": {
+        "userPaymentOptionId": "3491216111"
+    },
+    "currency": "USD",
+    "amount": "${amountUSD}",
+    "deviceDetails": {
+        "ipAddress": "127.0.0.1"
+    },
+    "timeStamp": "20260123172519",
+    "checksum": "{{checksum}}"
+}`;
+
+            const payoutResponse = `{
+    "internalRequestId": 115137577111,
+    "status": "SUCCESS",
+    "errCode": 0,
+    "reason": "",
+    "merchantId": "8631702020260252034",
+    "merchantSiteId": "242828",
+    "version": "1.0",
+    "userTokenId": "TESTACH1",
+    "clientUniqueId": "TESTACH",
+    "transactionStatus": "APPROVED",
+    "paymentMethodErrorCode": "0",
+    "userPaymentOptionId": "3491216111",
+    "externalTransactionId": "8110000000688460",
+    "transactionId": "8110000000023229654",
+    "orderId": "12754284111"
+}`;
 
             steps.push(
                 { msg: `STEP ${flowType === 'new' ? '3' : '1'}: Executing Payout`, delay: 600 },
                 { msg: 'POST /payout', delay: 400, type: 'api' },
-                { msg: `Payload: { userPaymentOptionId: "UPO_67890" }`, delay: 400, type: 'api' },
-                { msg: `currency: "USD", amount: "${amountUSD}"`, delay: 400, type: 'api' },
+                { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                 { msg: 'Nuvei processing ACH payout...', delay: 1500 },
                 { msg: '✓ ACH payout successful', delay: 1000, type: 'success' },
-                { msg: `${amountUSD} USD will arrive in 3-5 business days`, delay: 400, type: 'success' }
+                { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
+                { msg: `$${amountUSD} USD will arrive in 3-5 business days`, delay: 400, type: 'success' }
             );
 
             for (const step of steps) {
@@ -504,7 +592,6 @@
             btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Execute Payout';
         }
 
-        // Initialize on page load
         updateFXPreview();
         switchTab('card');
     </script>
