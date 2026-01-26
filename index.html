@@ -23,12 +23,6 @@
                 transform: translateX(0);
             }
         }
-        .fx-highlight {
-            background: linear-gradient(90deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body class="text-white">
@@ -81,50 +75,12 @@
                             <input type="text" id="traderName" value="John Smith" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-sm font-medium mb-1 text-blue-200">Amount (USD)</label>
-                                <input type="text" id="amountUSD" value="100.00" oninput="updateFXPreview()" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1 text-blue-200">Trader Country</label>
-                                <select id="traderCountry" onchange="updateFXPreview()" class="w-full px-3 py-2 bg-blue-900/50 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
-                                    <option value="US">🇺🇸 US (USD)</option>
-                                    <option value="GB">🇬🇧 UK (GBP)</option>
-                                    <option value="EU">🇪🇺 EU (EUR)</option>
-                                    <option value="AU">🇦🇺 AU (AUD)</option>
-                                    <option value="CA">🇨🇦 CA (CAD)</option>
-                                    <option value="JP">🇯🇵 JP (JPY)</option>
-                                </select>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-blue-200">Amount (USD)</label>
+                            <input type="text" id="amountUSD" value="100.00" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
 
                         <div id="cardFields">
-                            <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-lg p-4 mb-4">
-                                <label class="block text-sm font-medium mb-2 text-amber-200">💱 Currency Settlement</label>
-                                <div class="space-y-2">
-                                    <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="radio" name="settlementType" value="usd" checked onchange="updateFXPreview()" class="w-4 h-4">
-                                        <span class="text-sm">Pay in USD</span>
-                                    </label>
-                                    <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="radio" name="settlementType" value="local" onchange="updateFXPreview()" class="w-4 h-4">
-                                        <span class="text-sm">Pay in Local Currency (Trader handles FX)</span>
-                                    </label>
-                                </div>
-                                <div id="fxPreview" class="mt-3 p-3 bg-black/30 rounded-lg hidden">
-                                    <div class="text-xs text-gray-400 mb-1">MCP Rate Preview:</div>
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm">Rate:</span>
-                                        <span id="fxRate" class="font-mono fx-highlight"></span>
-                                    </div>
-                                    <div class="flex items-center justify-between mt-1">
-                                        <span class="text-sm">Trader Receives:</span>
-                                        <span id="convertedAmount" class="font-mono text-green-400 font-bold"></span>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Card Number</label>
                                 <input type="text" id="cardNumber" value="4000020951595032" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -285,15 +241,6 @@
         let currentTab = 'card';
         let processing = false;
 
-        const fxRates = {
-            'US': { currency: 'USD', rate: 1.00, symbol: '$' },
-            'GB': { currency: 'GBP', rate: 0.79, symbol: '£' },
-            'EU': { currency: 'EUR', rate: 0.92, symbol: '€' },
-            'AU': { currency: 'AUD', rate: 1.52, symbol: 'A$' },
-            'CA': { currency: 'CAD', rate: 1.36, symbol: 'C$' },
-            'JP': { currency: 'JPY', rate: 149.50, symbol: '¥' }
-        };
-
         function switchTab(tab) {
             currentTab = tab;
             
@@ -325,26 +272,6 @@
                 achTab.className = 'flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all bg-blue-500 text-white shadow-lg text-sm';
                 document.getElementById('achFields').style.display = 'block';
             }
-            
-            updateFXPreview();
-        }
-
-        function updateFXPreview() {
-            const country = document.getElementById('traderCountry').value;
-            const amountUSD = parseFloat(document.getElementById('amountUSD').value) || 0;
-            const settlementType = document.querySelector('input[name="settlementType"]:checked');
-            const fxPreview = document.getElementById('fxPreview');
-            
-            if (settlementType && settlementType.value === 'local' && country !== 'US') {
-                const fx = fxRates[country];
-                const convertedAmt = (amountUSD * fx.rate).toFixed(2);
-                
-                document.getElementById('fxRate').textContent = `1 USD = ${fx.rate} ${fx.currency}`;
-                document.getElementById('convertedAmount').textContent = `${fx.symbol}${convertedAmt} ${fx.currency}`;
-                fxPreview.classList.remove('hidden');
-            } else if (fxPreview) {
-                fxPreview.classList.add('hidden');
-            }
         }
 
         function addLog(message, type = 'info') {
@@ -355,7 +282,6 @@
             if (type === 'success') color = 'text-green-400';
             if (type === 'api') color = 'text-blue-400';
             if (type === 'warning') color = 'text-yellow-400';
-            if (type === 'fx') color = 'text-amber-400';
             
             const logEntry = document.createElement('div');
             logEntry.className = 'mb-3 flex items-start gap-2 log-entry';
@@ -382,9 +308,6 @@
             const cvv = document.getElementById('cvv').value;
             const traderName = document.getElementById('traderName').value;
             const amountUSD = document.getElementById('amountUSD').value;
-            const country = document.getElementById('traderCountry').value;
-            const settlementType = document.querySelector('input[name="settlementType"]:checked').value;
-            const fx = fxRates[country];
             
             let steps = [
                 { msg: 'Trader requested payout from dashboard', delay: 500 },
@@ -392,120 +315,7 @@
                 { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
             ];
 
-            if (settlementType === 'local' && country !== 'US') {
-                const getMCPPayload = `{
-    "sessionToken": "{{sessionToken}}",
-    "merchantId": "8631702020260252034",
-    "merchantSiteId": "242828",
-    "clientUniqueId": "TestMCP",
-    "rateType": "payout",
-    "fromCurrency": "USD",
-    "toCurrency": [
-        "${fx.currency}"
-    ],
-    "paymentMethods": [
-        "cc_card"
-    ]
-}`;
-
-                const getMCPResponse = `{
-    "merchantId": "8631702020260252034",
-    "merchantSiteId": "242828",
-    "clientUniqueId": "TestMCP",
-    "errCode": 0,
-    "rates": [
-        {
-            "ratesByCurrencies": [
-                {
-                    "rate": "${fx.rate}",
-                    "currency": "${fx.currency}"
-                }
-            ],
-            "paymentMethod": "cc_card"
-        }
-    ],
-    "sessionToken": "616beb03-df6a-43d6-abef-fbc081c93e08",
-    "internalRequestId": 14776101,
-    "mcpTimestamp": "Mon Oct 26 14:53:30 EET 2020",
-    "version": "1.0",
-    "status": "SUCCESS"
-}`;
-
-                const convertedAmt = (parseFloat(amountUSD) * fx.rate).toFixed(2);
-                
-                const payoutPayload = `{
-    "sessionToken": "{{sessionToken}}",
-    "merchantId": "{{merchantId}}",
-    "merchantSiteId": "{{merchantSiteId}}",
-    "clientRequestId": "{{clientRequestId}}",
-    "clientUniqueId": "{{clientUniqueId}}",
-    "userTokenId": "TESTCARDS1",
-    "cardData": { 
-        "cardNumber": "${cardNumber}",
-        "cardHolderName": "${traderName}",
-        "expirationMonth": "${expiryMonth}",
-        "expirationYear": "${expiryYear}",
-        "CVV": "${cvv}"
-    },
-    "currency": "${fx.currency}",
-    "amount": "${convertedAmt}",
-    "currencyConversion": {
-        "type": "MCP",
-        "originalAmount": "${amountUSD}",
-        "originalCurrency": "USD"
-    },
-    "deviceDetails": {
-        "ipAddress": "127.0.0.1"
-    },
-    "timeStamp": "{{timestamp}}",
-    "checksum": "{{checksum}}"
-}`;
-
-                const payoutResponse = `{
-    "internalRequestId": 115131018111,
-    "status": "SUCCESS",
-    "errCode": 0,
-    "reason": "",
-    "merchantId": "8631702020260252034",
-    "merchantSiteId": "242828",
-    "version": "1.0",
-    "clientRequestId": "20260123140058",
-    "userTokenId": "TESTACH1",
-    "clientUniqueId": "20180327175242",
-    "transactionStatus": "APPROVED",
-    "gwErrorCode": 0,
-    "gwExtendedErrorCode": 0,
-    "userPaymentOptionId": "3491194111",
-    "externalTransactionId": "",
-    "transactionId": "8110000000023228836",
-    "cardData": {
-        "acquirerId": "19",
-        "visaDirect": "NO",
-        "processedBrand": "VISA"
-    },
-    "merchantAdviceCode": "",
-    "orderId": "12754131111",
-    "isFastFunds": "0"
-}`;
-
-                steps.push(
-                    { msg: '💱 Local Currency Flow - Trader handles FX', delay: 600, type: 'fx' },
-                    { msg: 'STEP 1: Getting MCP Rates', delay: 400 },
-                    { msg: 'POST /getMCPRates', delay: 400, type: 'api' },
-                    { msg: `Request Payload:\n${getMCPPayload}`, delay: 400, type: 'api' },
-                    { msg: `✓ Rate received: 1 USD = ${fx.rate} ${fx.currency}`, delay: 600, type: 'fx' },
-                    { msg: `Response:\n${getMCPResponse}`, delay: 400, type: 'api' },
-                    { msg: `Original: $${amountUSD} USD → Converted: ${fx.symbol}${convertedAmt} ${fx.currency}`, delay: 400, type: 'fx' },
-                    { msg: 'STEP 2: Executing Card Payout', delay: 600 },
-                    { msg: 'POST /payout.do', delay: 400, type: 'api' },
-                    { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
-                    { msg: 'Nuvei processing card payout...', delay: 1500 },
-                    { msg: '✓ Card payout successful', delay: 800, type: 'success' },
-                    { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `${fx.symbol}${convertedAmt} ${fx.currency} delivered to trader's card`, delay: 400, type: 'success' }
-                );
-            } else {
-                const payoutPayload = `{
+            const payoutPayload = `{
     "sessionToken": "{{sessionToken}}",
     "merchantId": "8631702020260252034",
     "merchantSiteId": "242828",
@@ -523,7 +333,7 @@
     "checksum": "{{checksum}}"
 }`;
 
-                const payoutResponse = `{
+            const payoutResponse = `{
     "internalRequestId": 115137577111,
     "status": "SUCCESS",
     "errCode": 0,
@@ -541,18 +351,16 @@
     "orderId": "12754284111"
 }`;
 
-                steps.push(
-                    { msg: '✓ USD Flow - No currency conversion', delay: 600, type: 'success' },
-                    { msg: 'STEP 1: Executing Card Payout', delay: 600 },
-                    { msg: 'UPO detected - UPOID: 3491216111', delay: 400, type: 'api' },
-                    { msg: 'POST /payout.do', delay: 400, type: 'api' },
-                    { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
-                    { msg: 'Nuvei processing card payout...', delay: 1500 },
-                    { msg: '✓ Card payout successful', delay: 800, type: 'success' },
-                    { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
-                );
-            }
+            steps.push(
+                { msg: 'STEP 1: Executing Card Payout', delay: 600 },
+                { msg: 'UPO detected - UPOID: 3491216111', delay: 400, type: 'api' },
+                { msg: 'POST /payout.do', delay: 400, type: 'api' },
+                { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
+                { msg: 'Nuvei processing card payout...', delay: 1500 },
+                { msg: '✓ Card payout successful', delay: 800, type: 'success' },
+                { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
+                { msg: `$${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
+            );
 
             for (const step of steps) {
                 await sleep(step.delay);
@@ -750,7 +558,7 @@
                     { msg: 'Nuvei processing IBT/RTP payout...', delay: 1500 },
                     { msg: '✓ IBT/RTP payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `${amountUSD} USD delivered via IBT/RTP`, delay: 400, type: 'success' }
+                    { msg: `$${amountUSD} USD delivered via IBT/RTP`, delay: 400, type: 'success' }
                 );
             } else {
                 const accountCapturePayload = `{
@@ -854,7 +662,7 @@
                     { msg: 'Nuvei processing IBT/RTP payout...', delay: 1500 },
                     { msg: '✓ IBT/RTP payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `${amountUSD} USD delivered via IBT/RTP`, delay: 400, type: 'success' }
+                    { msg: `$${amountUSD} USD delivered via IBT/RTP`, delay: 400, type: 'success' }
                 );
             }
 
@@ -1038,7 +846,6 @@
             btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Execute Payout';
         }
 
-        updateFXPreview();
         switchTab('card');
     </script>
 </body>
