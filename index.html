@@ -81,6 +81,20 @@
                         </div>
 
                         <div id="cardFields">
+                            <div class="bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 mb-4">
+                                <p class="text-sm font-medium text-blue-200 mb-2">Flow Type</p>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="cardFlowType" value="existing" checked class="w-4 h-4">
+                                        <span class="text-sm">Existing UPO</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="cardFlowType" value="no_upo" class="w-4 h-4">
+                                        <span class="text-sm">No UPO</span>
+                                    </label>
+                                </div>
+                            </div>
+
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Card Number</label>
                                 <input type="text" id="cardNumber" value="4000020951595032" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -90,7 +104,7 @@
                                     <label class="block text-sm font-medium mb-1 text-blue-200">Expiry</label>
                                     <div class="flex gap-2">
                                         <input type="text" id="expiryMonth" placeholder="MM" value="12" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <input type="text" id="expiryYear" placeholder="YY" value="25" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <input type="text" id="expiryYear" placeholder="YY" value="29" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     </div>
                                 </div>
                                 <div>
@@ -308,6 +322,7 @@
             const cvv = document.getElementById('cvv').value;
             const traderName = document.getElementById('traderName').value;
             const amountUSD = document.getElementById('amountUSD').value;
+            const cardFlowType = document.querySelector('input[name="cardFlowType"]:checked').value;
             
             let steps = [
                 { msg: 'Trader requested payout from dashboard', delay: 500 },
@@ -315,7 +330,8 @@
                 { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
             ];
 
-            const payoutPayload = `{
+            if (cardFlowType === 'existing') {
+                const payoutPayload = `{
     "sessionToken": "{{sessionToken}}",
     "merchantId": "8631702020260252034",
     "merchantSiteId": "242828",
@@ -333,7 +349,7 @@
     "checksum": "{{checksum}}"
 }`;
 
-            const payoutResponse = `{
+                const payoutResponse = `{
     "internalRequestId": 115137577111,
     "status": "SUCCESS",
     "errCode": 0,
@@ -351,16 +367,70 @@
     "orderId": "12754284111"
 }`;
 
-            steps.push(
-                { msg: 'STEP 1: Executing Card Payout', delay: 600 },
-                { msg: 'UPO detected - UPOID: 3491216111', delay: 400, type: 'api' },
-                { msg: 'POST /payout.do', delay: 400, type: 'api' },
-                { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
-                { msg: 'Nuvei processing card payout...', delay: 1500 },
-                { msg: '✓ Card payout successful', delay: 800, type: 'success' },
-                { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                { msg: `$${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
-            );
+                steps.push(
+                    { msg: '✓ Existing UPO Flow - Using stored card UPO', delay: 600, type: 'success' },
+                    { msg: 'UPO detected - UPOID: 3491216111', delay: 400, type: 'api' },
+                    { msg: 'STEP 1: Executing Card Payout', delay: 600 },
+                    { msg: 'POST /payout.do', delay: 400, type: 'api' },
+                    { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing card payout...', delay: 1500 },
+                    { msg: '✓ Card payout successful', delay: 800, type: 'success' },
+                    { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
+                    { msg: `${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
+                );
+            } else {
+                const payoutPayload = `{
+    "sessionToken": "{{sessionToken}}",
+    "merchantId": "8631702020260252034",
+    "merchantSiteId": "242828",
+    "clientUniqueId": "TESTCARDS1",
+    "userTokenId": "TESTCARDS1",
+    "cardData": { 
+        "cardNumber": "${cardNumber}",
+        "cardHolderName": "${traderName}",
+        "expirationMonth": "${expiryMonth}",
+        "expirationYear": "${expiryYear}",
+        "CVV": "${cvv}"
+    },
+    "currency": "USD",
+    "amount": "${amountUSD}",
+    "deviceDetails": {
+        "ipAddress": "127.0.0.1"
+    },
+    "timeStamp": "20260123204724",
+    "checksum": "{{checksum}}"
+}`;
+
+                const payoutResponse = `{
+    "internalRequestId": 115137577111,
+    "status": "SUCCESS",
+    "errCode": 0,
+    "reason": "",
+    "merchantId": "8631702020260252034",
+    "merchantSiteId": "242828",
+    "version": "1.0",
+    "userTokenId": "TESTCARDS1",
+    "clientUniqueId": "TESTCARDS1",
+    "transactionStatus": "APPROVED",
+    "paymentMethodErrorCode": "0",
+    "userPaymentOptionId": "3491216111",
+    "externalTransactionId": "8110000000688460",
+    "transactionId": "8110000000023229654",
+    "orderId": "12754284111"
+}`;
+
+                steps.push(
+                    { msg: '🔄 No UPO Flow - Using card data directly', delay: 600, type: 'warning' },
+                    { msg: 'No UPO detected', delay: 400, type: 'warning' },
+                    { msg: 'STEP 1: Executing Card Payout', delay: 600 },
+                    { msg: 'POST /payout.do', delay: 400, type: 'api' },
+                    { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
+                    { msg: 'Nuvei processing card payout...', delay: 1500 },
+                    { msg: '✓ Card payout successful', delay: 800, type: 'success' },
+                    { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
+                    { msg: `${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
+                );
+            }
 
             for (const step of steps) {
                 await sleep(step.delay);
