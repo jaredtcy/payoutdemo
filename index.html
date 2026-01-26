@@ -132,8 +132,8 @@
                             <div>
                                 <label class="block text-sm font-medium mb-1 text-blue-200">Wallet Provider</label>
                                 <select id="walletProvider" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="ApplePay">🍎 Apple Pay</option>
-                                    <option value="GooglePay">📱 Google Pay</option>
+                                    <option value="ApplePay"> Apple Pay</option>
+                                    <option value="GooglePay"> Google Pay</option>
                                 </select>
                             </div>
                             <div class="mt-4">
@@ -327,7 +327,7 @@
             let steps = [
                 { msg: 'Trader requested payout from dashboard', delay: 500 },
                 { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
+                { msg: 'Profit Team: Manual review approved', delay: 1000, type: 'success' }
             ];
 
             if (cardFlowType === 'existing') {
@@ -368,13 +368,13 @@
 }`;
 
                 steps.push(
-                    { msg: '✓ Existing UPO Flow - Using stored card UPO', delay: 600, type: 'success' },
+                    { msg: 'Existing UPO Flow - Using stored card UPO', delay: 600, type: 'success' },
                     { msg: 'UPO detected - UPOID: 3491216111', delay: 400, type: 'api' },
                     { msg: 'STEP 1: Executing Card Payout', delay: 600 },
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing card payout...', delay: 1500 },
-                    { msg: '✓ Card payout successful', delay: 800, type: 'success' },
+                    { msg: 'Card payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
                     { msg: `${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
                 );
@@ -420,13 +420,13 @@
 }`;
 
                 steps.push(
-                    { msg: '🔄 No UPO Flow - Using card data directly', delay: 600, type: 'warning' },
+                    { msg: 'No UPO Flow - Using card data directly', delay: 600, type: 'warning' },
                     { msg: 'No UPO detected', delay: 400, type: 'warning' },
                     { msg: 'STEP 1: Executing Card Payout', delay: 600 },
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing card payout...', delay: 1500 },
-                    { msg: '✓ Card payout successful', delay: 800, type: 'success' },
+                    { msg: 'Card payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
                     { msg: `${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
                 );
@@ -447,7 +447,7 @@
             let steps = [
                 { msg: 'Trader requested payout from dashboard', delay: 500 },
                 { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
+                { msg: 'Profit Team: Manual review approved', delay: 1000, type: 'success' }
             ];
 
             if (walletFlowType === 'existing') {
@@ -497,13 +497,13 @@
 }`;
 
                 steps.push(
-                    { msg: '✓ Existing UPO Flow - Using stored wallet UPO', delay: 600, type: 'success' },
+                    { msg: 'Existing UPO Flow - Using stored wallet UPO', delay: 600, type: 'success' },
                     { msg: 'Retrieved: userPaymentOptionId: 3491216112', delay: 400, type: 'api' },
                     { msg: `STEP 1: Executing ${walletProvider} Payout`, delay: 600 },
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing wallet payout...', delay: 1500 },
-                    { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
+                    { msg: `${walletProvider} payout successful`, delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
                     { msg: `$${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
                 );
@@ -555,12 +555,12 @@
 }`;
 
                 steps.push(
-                    { msg: '🔄 No UPO Flow - Using external token', delay: 600, type: 'warning' },
+                    { msg: 'No UPO Flow - Using external token', delay: 600, type: 'warning' },
                     { msg: `STEP 1: Executing ${walletProvider} Payout`, delay: 600 },
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing wallet payout with external token...', delay: 1500 },
-                    { msg: `✓ ${walletProvider} payout successful`, delay: 800, type: 'success' },
+                    { msg: `${walletProvider} payout successful`, delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
                     { msg: `$${amountUSD} USD delivered to ${walletProvider}`, delay: 400, type: 'success' }
                 );
@@ -579,7 +579,7 @@
             let steps = [
                 { msg: 'Trader requested payout from dashboard', delay: 500 },
                 { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
+                { msg: 'Profit Team: Manual review approved', delay: 1000, type: 'success' }
             ];
 
             if (ibtFlowType === 'existing') {
@@ -620,13 +620,13 @@
 }`;
 
                 steps.push(
-                    { msg: '✓ Existing UPO Flow - Using stored IBT UPO', delay: 600, type: 'success' },
+                    { msg: 'Existing UPO Flow - Using stored IBT UPO', delay: 600, type: 'success' },
                     { msg: 'Retrieved: userPaymentOptionId: 3491770111', delay: 400, type: 'api' },
                     { msg: 'STEP 1: Executing IBT/RTP Payout', delay: 600 },
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing IBT/RTP payout...', delay: 1500 },
-                    { msg: '✓ IBT/RTP payout successful', delay: 800, type: 'success' },
+                    { msg: 'IBT/RTP payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
                     { msg: `$${amountUSD} USD delivered via IBT/RTP`, delay: 400, type: 'success' }
                 );
@@ -713,16 +713,16 @@
 }`;
 
                 steps.push(
-                    { msg: '🔄 No UPO Flow - Account capture required', delay: 600, type: 'warning' },
+                    { msg: 'No UPO Flow - Account capture required', delay: 600, type: 'warning' },
                     { msg: 'STEP 1: Initiating Account Capture', delay: 400 },
                     { msg: 'POST /accountCapture', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${accountCapturePayload}`, delay: 400, type: 'api' },
-                    { msg: '✓ Account capture initiated', delay: 800, type: 'success' },
+                    { msg: 'Account capture initiated', delay: 800, type: 'success' },
                     { msg: `Response:\n${accountCaptureResponse}`, delay: 400, type: 'api' },
                     { msg: 'Redirecting user to bank selection portal...', delay: 800, type: 'warning' },
                     { msg: 'URL: https://pay-pd-mint.mazooma.com/bank-select?code=3c6b57a0...', delay: 600, type: 'api' },
                     { msg: 'User completing bank authentication...', delay: 2000 },
-                    { msg: '✓ Bank authentication completed', delay: 1000, type: 'success' },
+                    { msg: 'Bank authentication completed', delay: 1000, type: 'success' },
                     { msg: 'STEP 2: DMN Received', delay: 600 },
                     { msg: 'UPOID identified from DMN: 3491770111', delay: 400, type: 'success' },
                     { msg: `DMN Data:\n${dmnData}`, delay: 400, type: 'api' },
@@ -730,7 +730,7 @@
                     { msg: 'POST /payout.do', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${payoutPayload}`, delay: 400, type: 'api' },
                     { msg: 'Nuvei processing IBT/RTP payout...', delay: 1500 },
-                    { msg: '✓ IBT/RTP payout successful', delay: 800, type: 'success' },
+                    { msg: 'IBT/RTP payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
                     { msg: `$${amountUSD} USD delivered via IBT/RTP`, delay: 400, type: 'success' }
                 );
@@ -754,7 +754,7 @@
             let steps = [
                 { msg: 'Trader requested payout from dashboard', delay: 500 },
                 { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: '✓ Profit Team: Manual review approved', delay: 1000, type: 'success' }
+                { msg: ' Profit Team: Manual review approved', delay: 1000, type: 'success' }
             ];
 
             if (flowType === 'new') {
@@ -814,21 +814,21 @@
 }`;
 
                 steps.push(
-                    { msg: '🔄 Open Loop Flow - New user detected', delay: 600, type: 'warning' },
+                    { msg: 'Open Loop Flow - New user detected', delay: 600, type: 'warning' },
                     { msg: 'STEP 1: Creating User Account', delay: 400 },
                     { msg: 'POST /createUser', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${createUserPayload}`, delay: 400, type: 'api' },
-                    { msg: '✓ User created', delay: 800, type: 'success' },
+                    { msg: 'User created', delay: 800, type: 'success' },
                     { msg: `Response:\n${createUserResponse}`, delay: 400, type: 'api' },
                     { msg: 'STEP 2: Adding Bank Account (UPO)', delay: 600 },
                     { msg: 'POST /addUPOAPM', delay: 400, type: 'api' },
                     { msg: `Request Payload:\n${addUPOPayload}`, delay: 400, type: 'api' },
-                    { msg: '✓ UPO created', delay: 1000, type: 'success' },
+                    { msg: 'UPO created', delay: 1000, type: 'success' },
                     { msg: `Response:\n${addUPOResponse}`, delay: 400, type: 'api' }
                 );
             } else {
                 steps.push(
-                    { msg: '✓ Closed Loop Flow - Using stored UPO', delay: 600, type: 'success' },
+                    { msg: ' Closed Loop Flow - Using stored UPO', delay: 600, type: 'success' },
                     { msg: 'Retrieved: userPaymentOptionId: 3491216111', delay: 400, type: 'api' }
                 );
             }
