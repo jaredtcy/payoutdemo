@@ -325,9 +325,7 @@
             const cardFlowType = document.querySelector('input[name="cardFlowType"]:checked').value;
             
             let steps = [
-                { msg: 'Trader requested payout from dashboard', delay: 500 },
-                { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: 'Profit Team: Manual review approved', delay: 1000, type: 'success' }
+                { msg: 'Customer requested payout from dashboard', delay: 500 }
             ];
 
             if (cardFlowType === 'existing') {
@@ -376,7 +374,7 @@
                     { msg: 'Nuvei processing card payout...', delay: 1500 },
                     { msg: 'Card payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
+                    { msg: `${amountUSD} USD delivered to customer's card`, delay: 400, type: 'success' }
                 );
             } else {
                 const payoutPayload = `{
@@ -428,7 +426,7 @@
                     { msg: 'Nuvei processing card payout...', delay: 1500 },
                     { msg: 'Card payout successful', delay: 800, type: 'success' },
                     { msg: `Response:\n${payoutResponse}`, delay: 400, type: 'api' },
-                    { msg: `${amountUSD} USD delivered to trader's card`, delay: 400, type: 'success' }
+                    { msg: `${amountUSD} USD delivered to customer's card`, delay: 400, type: 'success' }
                 );
             }
 
@@ -445,9 +443,7 @@
             const walletFlowType = document.querySelector('input[name="walletFlowType"]:checked').value;
             
             let steps = [
-                { msg: 'Trader requested payout from dashboard', delay: 500 },
-                { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: 'Profit Team: Manual review approved', delay: 1000, type: 'success' }
+                { msg: 'Customer requested payout from dashboard', delay: 500 }
             ];
 
             if (walletFlowType === 'existing') {
@@ -577,9 +573,7 @@
             const ibtFlowType = document.querySelector('input[name="ibtFlowType"]:checked').value;
             
             let steps = [
-                { msg: 'Trader requested payout from dashboard', delay: 500 },
-                { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: 'Profit Team: Manual review approved', delay: 1000, type: 'success' }
+                { msg: 'Customer requested payout from dashboard', delay: 500 }
             ];
 
             if (ibtFlowType === 'existing') {
@@ -752,9 +746,7 @@
             const flowType = document.querySelector('input[name="flowType"]:checked').value;
             
             let steps = [
-                { msg: 'Trader requested payout from dashboard', delay: 500 },
-                { msg: 'Funds transferred to TPT internal wallet', delay: 800 },
-                { msg: ' Profit Team: Manual review approved', delay: 1000, type: 'success' }
+                { msg: 'Customer requested payout from dashboard', delay: 500 }
             ];
 
             if (flowType === 'new') {
